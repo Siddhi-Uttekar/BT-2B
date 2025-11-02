@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>🌊 WavePortal - Send Your Wave</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-dark: #0a0e27;
+        --bg-darker: #050810;
+        --card-bg: #0f1729;
+        --card-hover: #121b30;
+        --accent: #06b6d4;
+        --accent-hover: #08d9ff;
+        --accent-dark: #0891b2;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --error: #ef4444;
+        --text-primary: #f0f9ff;
+        --text-secondary: #94a3b8;
+        --text-muted: #64748b;
+        --border: rgba(148, 163, 184, 0.1);
+        --border-hover: rgba(148, 163, 184, 0.2);
+        --shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+        --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.6);
+        color-scheme: dark;
+      }
+
+      body {
+        background: linear-gradient(
+          135deg,
+          var(--bg-darker) 0%,
+          var(--bg-dark) 50%,
+          #0a1628 100%
+        );
+        background-attachment: fixed;
+        color: var(--text-primary);
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      /* Animated background particles */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(
+            circle at 20% 30%,
+            rgba(6, 182, 212, 0.05) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 70%,
+            rgba(6, 182, 212, 0.03) 0%,
+            transparent 50%
+          );
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Header */
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 40px 20px;
+      }
+
+      .header h1 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 700;
+        margin: 0 0 16px 0;
+        background: linear-gradient(
+          135deg,
+          var(--accent) 0%,
+          var(--accent-hover) 100%
+        );
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        animation: fadeInDown 0.6s ease-out;
+      }
+
+      .header p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto;
+        animation: fadeIn 0.8s ease-out 0.2s both;
+      }
+
+      /* Cards */
+      .card {
+        background: var(--card-bg);
+        border-radius: 20px;
+        padding: 32px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        margin-bottom: 24px;
+        transition: all 0.3s ease;
+        animation: fadeInUp 0.6s ease-out;
+      }
+
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--border-hover);
+      }
+
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .card-title::before {
+        content: "";
+        width: 4px;
+        height: 24px;
+        background: linear-gradient(180deg, var(--accent), var(--accent-dark));
+        border-radius: 2px;
+      }
+
+      /* Buttons */
+      button {
+        background: linear-gradient(
+          135deg,
+          var(--accent) 0%,
+          var(--accent-dark) 100%
+        );
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(6, 182, 212, 0.2);
+        font-family: inherit;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+        background: linear-gradient(
+          135deg,
+          var(--accent-hover) 0%,
+          var(--accent) 100%
+        );
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      button.secondary {
+        background: transparent;
+        border: 2px solid var(--accent);
+        color: var(--accent);
+        box-shadow: none;
+      }
+
+      button.secondary:hover {
+        background: rgba(6, 182, 212, 0.1);
+        border-color: var(--accent-hover);
+        color: var(--accent-hover);
+      }
+
+      /* Connected wallet button state */
+      button.connected {
+        background: linear-gradient(
+          135deg,
+          #667eea 0%,
+          #764ba2 100%
+        ) !important;
+        position: relative;
+        padding-left: 32px;
+      }
+
+      button.connected::before {
+        content: "🟢";
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 10px;
+      }
+
+      button.connected:hover {
+        background: linear-gradient(
+          135deg,
+          #764ba2 0%,
+          #667eea 100%
+        ) !important;
+      }
+
+      /* Inputs */
+      input[type="text"],
+      select,
+      textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 12px;
+        border: 2px solid var(--border);
+        background: rgba(15, 23, 41, 0.5);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        outline: none;
+      }
+
+      input[type="text"]:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--accent);
+        background: rgba(15, 23, 41, 0.8);
+        box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+      }
+
+      textarea {
+        resize: vertical;
+        min-height: 100px;
+      }
+
+      select {
+        cursor: pointer;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+
+      /* Layout utilities */
+      .row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+      }
+
+      .row > * {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .row button {
+        flex: 0 0 auto;
+        min-width: fit-content;
+      }
+
+      /* Status bar */
+      .status {
+        padding: 16px 20px;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        animation: slideIn 0.3s ease-out;
+      }
+
+      .status.idle {
+        background: rgba(100, 116, 139, 0.1);
+        border: 1px solid rgba(100, 116, 139, 0.2);
+        color: var(--text-secondary);
+      }
+
+      .status.loading {
+        background: rgba(6, 182, 212, 0.1);
+        border: 1px solid rgba(6, 182, 212, 0.3);
+        color: var(--accent);
+      }
+
+      .status.success {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: var(--success);
+      }
+
+      .status.error {
+        background: rgba(239, 68, 68, 0.1);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: var(--error);
+      }
+
+      .status::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: currentColor;
+        animation: pulse 2s infinite;
+      }
+
+      /* Network badge */
+      .network-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: rgba(6, 182, 212, 0.1);
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--accent);
+        transition: all 0.3s ease;
+      }
+
+      .network-badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        background: var(--success);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+      }
+
+      /* Disconnected network badge state */
+      .network-badge.disconnected {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: rgba(255, 255, 255, 0.1);
+        color: var(--text-muted);
+      }
+
+      .network-badge.disconnected::before {
+        background: var(--text-muted);
+        animation: none;
+      }
+
+      /* Waves list */
+      .waves-list {
+        list-style: none;
+        padding: 0;
+        margin: 20px 0 0 0;
+        display: grid;
+        gap: 12px;
+      }
+
+      .wave-item {
+        padding: 20px;
+        border-radius: 12px;
+        background: linear-gradient(
+          135deg,
+          rgba(15, 23, 41, 0.8) 0%,
+          rgba(10, 14, 39, 0.6) 100%
+        );
+        border: 1px solid var(--border);
+        transition: all 0.3s ease;
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      .wave-item:hover {
+        border-color: var(--accent);
+        transform: translateX(4px);
+        background: linear-gradient(
+          135deg,
+          rgba(15, 23, 41, 0.95) 0%,
+          rgba(10, 14, 39, 0.8) 100%
+        );
+      }
+
+      .wave-from {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-bottom: 8px;
+        font-family: "Monaco", "Courier New", monospace;
+      }
+
+      .wave-message {
+        font-size: 1.05rem;
+        color: var(--text-primary);
+        margin: 12px 0;
+        line-height: 1.6;
+      }
+
+      .wave-timestamp {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 8px;
+      }
+
+      /* Stats */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+        margin: 20px 0;
+      }
+
+      .stat-card {
+        padding: 20px;
+        background: linear-gradient(
+          135deg,
+          rgba(6, 182, 212, 0.1) 0%,
+          rgba(6, 182, 212, 0.05) 100%
+        );
+        border: 1px solid rgba(6, 182, 212, 0.2);
+        border-radius: 12px;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent);
+        display: block;
+      }
+
+      .stat-label {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+
+      /* Divider */
+      hr {
+        border: none;
+        height: 1px;
+        background: var(--border);
+        margin: 32px 0;
+      }
+
+      /* Loading spinner */
+      .spinner {
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(6, 182, 212, 0.2);
+        border-top-color: var(--accent);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes fadeInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(-20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .container {
+          padding: 0 12px;
+        }
+
+        .card {
+          padding: 24px 20px;
+        }
+
+        .header {
+          padding: 20px;
+        }
+
+        .row {
+          flex-direction: column;
+        }
+
+        .row > * {
+          width: 100%;
+        }
+      }
+
+      /* Utility classes */
+      .text-center {
+        text-align: center;
+      }
+
+      .mt-4 {
+        margin-top: 20px;
+      }
+
+      .mb-4 {
+        margin-bottom: 20px;
+      }
+
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ethers v6 (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.0/dist/ethers.umd.min.js"></script>
+
+    <div class="container">
+      <!-- Header -->
+      <div class="header">
+        <h1>🌊 WavePortal</h1>
+        <p>
+          Send your wave to the blockchain. Connect your wallet, write a
+          message, and join the wave!
+        </p>
+      </div>
+
+      <!-- Wallet Connection Card -->
+      <div class="card">
+        <h2 class="card-title">Connect Your Wallet</h2>
+        <div class="row">
+          <button id="connectBtn">
+            <span id="connectBtnText">Connect Wallet</span>
+          </button>
+          <button id="switchNetworkBtn" class="secondary" style="display: none">
+            🔄 Switch Network
+          </button>
+          <div style="margin-left: auto" class="network-badge">
+            <span id="networkName">Not Connected</span>
+          </div>
+        </div>
+
+        <!-- Network Selector (hidden by default) -->
+        <div
+          id="networkSelector"
+          style="
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+          "
+        >
+          <label for="networkSelect">Select Network to Switch</label>
+          <select id="networkSelect" style="margin-top: 8px">
+            <option value="">-- Select Network --</option>
+            <option value="hardhat">Hardhat Local (31337)</option>
+            <option value="sepolia">Sepolia Testnet (11155111)</option>
+            <option value="mainnet">Ethereum Mainnet (1)</option>
+            <option value="goerli">Goerli Testnet (5)</option>
+            <option value="polygon">Polygon Mainnet (137)</option>
+            <option value="mumbai">Polygon Mumbai (80001)</option>
+          </select>
+          <div class="row" style="margin-top: 12px">
+            <button id="confirmSwitchBtn" class="secondary">
+              ✓ Confirm Switch
+            </button>
+            <button id="cancelSwitchBtn" class="secondary">✕ Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contract Configuration Card -->
+      <div class="card">
+        <h2 class="card-title">Contract Configuration</h2>
+        <div style="margin-bottom: 16px">
+          <label for="artifactSelect">Select Contract Artifact</label>
+          <select id="artifactSelect">
+            <option value="">-- select artifact --</option>
+            <option
+              value="artifacts/contracts/WavePortal.sol/WavePortal.json"
+              selected
+            >
+              WavePortal
+            </option>
+          </select>
+        </div>
+        <div style="margin-bottom: 16px">
+          <label for="contractAddress">Contract Address</label>
+          <input
+            id="contractAddress"
+            type="text"
+            value="0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512"
+            placeholder="0x..."
+          />
+        </div>
+        <button id="loadArtifactBtn" class="secondary">Load Artifact</button>
+      </div>
+
+      <!-- Send Wave Card -->
+      <div class="card">
+        <h2 class="card-title">Send a Wave 👋</h2>
+        <div style="margin-bottom: 16px">
+          <label for="message">Your Message</label>
+          <textarea
+            id="message"
+            rows="4"
+            placeholder="Write your message to the world..."
+          ></textarea>
+        </div>
+        <div class="row">
+          <button id="sendWave">🚀 Send Wave</button>
+          <button id="getTotal" class="secondary">📊 Get Total Waves</button>
+          <button id="getAll" class="secondary">📜 View All Waves</button>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="status idle" id="status">
+        <span id="statusText">Ready to connect</span>
+      </div>
+
+      <!-- Dynamic Function UIs -->
+      <div id="viewFns"></div>
+      <div id="writeFns"></div>
+
+      <!-- Waves Display -->
+      <div class="card">
+        <h2 class="card-title">Wave History 📝</h2>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-value" id="totalWavesCount">0</span>
+            <span class="stat-label">Total Waves</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="uniqueWavers">0</span>
+            <span class="stat-label">Unique Wavers</span>
+          </div>
+        </div>
+
+        <hr />
+
+        <ul class="waves-list" id="wavesList">
+          <li
+            class="text-center"
+            style="color: var(--text-muted); padding: 40px 20px"
+          >
+            No waves yet. Be the first to send one! 🌊
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Wait for ethers library to load before initializing
+      window.addEventListener("load", function () {
+        // Check if ethers is loaded
+        if (typeof ethers === "undefined") {
+          console.error("Ethers library failed to load!");
+          document.getElementById("status").textContent =
+            "Status: Error - Ethers library not loaded. Please refresh.";
+          return;
+        }
+
+        console.log("Ethers library loaded successfully:", ethers.version);
+
+        // ---------- ABI: default (WavePortal) but can be replaced by loading an artifact ----------
+        let ABI = [
+          "event NewWave(address indexed from, uint256 timestamp, string message)",
+          "function wave(string memory _message) public",
+          "function getTotalWaves() public view returns (uint256)",
+          "function getAllWaves() public view returns (tuple(address waver, string message, uint256 timestamp)[])",
+        ];
+
+        // Helper: load compiled artifact JSON (path relative to repo root when served)
+        async function loadArtifact(path) {
+          try {
+            setStatus("Loading artifact: " + path, "loading");
+            const res = await fetch(path);
+            if (!res.ok)
+              throw new Error("Failed to fetch artifact: " + res.status);
+            const art = await res.json();
+            if (!art.abi) throw new Error("No ABI found in artifact");
+            ABI = art.abi;
+            setStatus(
+              "Artifact loaded: " + (art.contractName || path),
+              "success"
+            );
+
+            // regenerate view functions UI
+            generateViewUI(ABI);
+            // regenerate write functions UI
+            generateWriteUI(ABI);
+          } catch (err) {
+            console.error(err);
+            setStatus("Error loading artifact", "error");
+          }
+        }
+
+        // Build a tiny UI for view/pure functions (read-only) found in the ABI
+        function generateViewUI(abi) {
+          const viewContainer = document.getElementById("viewFns");
+          viewContainer.innerHTML = "";
+          const fns = abi.filter(
+            (e) =>
+              e.type === "function" &&
+              (e.stateMutability === "view" || e.stateMutability === "pure")
+          );
+          if (!fns.length) {
+            viewContainer.innerHTML =
+              '<div class="small">No view functions found in ABI.</div>';
+            return;
+          }
+          const box = document.createElement("div");
+          box.className = "card";
+          box.style.marginTop = "8px";
+          box.innerHTML = `<h2 style="font-size:16px;margin:0 0 8px 0">Read functions</h2>`;
+          fns.forEach((fn) => {
+            const fnRow = document.createElement("div");
+            fnRow.style.marginBottom = "10px";
+            const inputsHtml =
+              fn.inputs && fn.inputs.length
+                ? fn.inputs.map(
+                    (inp, idx) =>
+                      `<input data-fn="${
+                        fn.name
+                      }" data-idx="${idx}" placeholder="${
+                        inp.name || inp.type
+                      }" style="margin-right:6px" />`
+                  )
+                : "";
+            fnRow.innerHTML = `
+            <div style="font-weight:600">${fn.name}()</div>
+            <div class="small">${
+              fn.inputs && fn.inputs.length ? "Inputs:" : ""
+            } ${fn.inputs && fn.inputs.length ? "" : ""}</div>
+            <div style="margin-top:6px">${inputsHtml}<button data-call-fn="${
+              fn.name
+            }">Call</button></div>
+            <div class="small" style="margin-top:6px" data-output-for="${
+              fn.name
+            }"></div>
+          `;
+            // wire call handler
+            fnRow
+              .querySelector(`[data-call-fn]`)
+              .addEventListener("click", async (e) => {
+                const addr = contractAddressInput.value.trim();
+                if (!addr || addr === "CONTRACT_ADDRESS") {
+                  setStatus("Set a contract address first");
+                  return;
+                }
+                // create contract with provider (read-only) if available
+                try {
+                  const providerForRead =
+                    provider || new ethers.BrowserProvider(window.ethereum);
+                  const readContract = new ethers.Contract(
+                    addr,
+                    ABI,
+                    providerForRead
+                  );
+                  // gather inputs
+                  const inputs = Array.from(
+                    fnRow.querySelectorAll("input")
+                  ).map((el) => el.value);
+                  setStatus(`Calling ${fn.name}...`);
+                  const out = await readContract[fn.name](...inputs);
+                  const outEl = fnRow.querySelector(
+                    `[data-output-for="${fn.name}"]`
+                  );
+                  outEl.textContent = `Result: ${JSON.stringify(out)}`;
+                  setStatus(`Called ${fn.name}`);
+                } catch (err) {
+                  console.error(err);
+                  setStatus("Read call failed (see console)");
+                }
+              });
+            box.appendChild(fnRow);
+          });
+          viewContainer.appendChild(box);
+        }
+
+        // Build UI for write (non-view, non-pure) functions
+        function generateWriteUI(abi) {
+          const writeContainer = document.getElementById("writeFns");
+          writeContainer.innerHTML = "";
+          const fns = abi.filter(
+            (e) =>
+              e.type === "function" &&
+              e.stateMutability !== "view" &&
+              e.stateMutability !== "pure"
+          );
+          if (!fns.length) {
+            return; // No write functions, skip
+          }
+          const box = document.createElement("div");
+          box.className = "card";
+          box.style.marginTop = "8px";
+          box.innerHTML = `<h2 style="font-size:16px;margin:0 0 8px 0">Write functions (requires wallet)</h2>`;
+          fns.forEach((fn) => {
+            const fnRow = document.createElement("div");
+            fnRow.style.marginBottom = "10px";
+            const inputsHtml =
+              fn.inputs && fn.inputs.length
+                ? fn.inputs
+                    .map(
+                      (inp, idx) =>
+                        `<input data-write-fn="${
+                          fn.name
+                        }" data-idx="${idx}" placeholder="${
+                          inp.name || inp.type
+                        }" style="margin-right:6px;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.2);color:inherit;" />`
+                    )
+                    .join("")
+                : "";
+            fnRow.innerHTML = `
+              <div style="font-weight:600">${fn.name}()</div>
+              <div class="small">${
+                fn.inputs && fn.inputs.length ? "Parameters:" : "No parameters"
+              }</div>
+              <div style="margin-top:6px">${inputsHtml}<button data-execute-fn="${
+              fn.name
+            }" style="background:var(--accent);color:#052022;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:600;">Execute</button></div>
+              <div class="small" style="margin-top:6px;color:var(--muted);" data-tx-for="${
+                fn.name
+              }"></div>
+            `;
+            // wire execute handler
+            fnRow
+              .querySelector(`[data-execute-fn]`)
+              .addEventListener("click", async (e) => {
+                if (!contract || !signer) {
+                  setStatus("Connect wallet first");
+                  return;
+                }
+                try {
+                  const inputs = Array.from(
+                    fnRow.querySelectorAll(`input[data-write-fn="${fn.name}"]`)
+                  ).map((el) => el.value);
+                  setStatus(`Executing ${fn.name}...`);
+                  const tx = await contract[fn.name](...inputs);
+                  const txEl = fnRow.querySelector(
+                    `[data-tx-for="${fn.name}"]`
+                  );
+                  txEl.textContent = `Transaction sent: ${tx.hash.substring(
+                    0,
+                    10
+                  )}... Waiting...`;
+                  setStatus("Waiting for confirmation...");
+                  await tx.wait();
+                  txEl.textContent = `✅ Transaction confirmed: ${tx.hash.substring(
+                    0,
+                    20
+                  )}...`;
+                  setStatus(`${fn.name} executed successfully!`);
+                } catch (err) {
+                  console.error(err);
+                  setStatus("Transaction failed (see console)");
+                  const txEl = fnRow.querySelector(
+                    `[data-tx-for="${fn.name}"]`
+                  );
+                  txEl.textContent = `❌ Error: ${err.message.substring(
+                    0,
+                    100
+                  )}`;
+                }
+              });
+            box.appendChild(fnRow);
+          });
+          writeContainer.appendChild(box);
+        }
+
+        // Convenience DOM refs
+        const connectBtn = document.getElementById("connectBtn");
+        const sendWaveBtn = document.getElementById("sendWave");
+        const getAllBtn = document.getElementById("getAll");
+        const getTotalBtn = document.getElementById("getTotal");
+        const statusEl = document.getElementById("status");
+        const wavesList = document.getElementById("wavesList");
+        const totalWavesEl = document.getElementById("totalWaves");
+        const contractAddressInput = document.getElementById("contractAddress");
+        const networkNameEl = document.getElementById("networkName");
+
+        let provider;
+        let signer;
+        let contract;
+        let isConnected = false;
+
+        // Network configurations
+        const NETWORKS = {
+          hardhat: {
+            chainId: "0x7a69", // 31337 in hex
+            chainName: "Hardhat Local",
+            rpcUrls: ["http://127.0.0.1:8545"],
+            nativeCurrency: {
+              name: "ETH",
+              symbol: "ETH",
+              decimals: 18,
+            },
+          },
+          sepolia: {
+            chainId: "0xaa36a7", // 11155111 in hex
+            chainName: "Sepolia Testnet",
+            rpcUrls: ["https://rpc.sepolia.org"],
+            nativeCurrency: {
+              name: "ETH",
+              symbol: "ETH",
+              decimals: 18,
+            },
+            blockExplorerUrls: ["https://sepolia.etherscan.io"],
+          },
+          mainnet: {
+            chainId: "0x1", // 1 in hex
+            chainName: "Ethereum Mainnet",
+            rpcUrls: ["https://eth.llamarpc.com"],
+            nativeCurrency: {
+              name: "ETH",
+              symbol: "ETH",
+              decimals: 18,
+            },
+            blockExplorerUrls: ["https://etherscan.io"],
+          },
+          goerli: {
+            chainId: "0x5", // 5 in hex
+            chainName: "Goerli Testnet",
+            rpcUrls: ["https://rpc.ankr.com/eth_goerli"],
+            nativeCurrency: {
+              name: "ETH",
+              symbol: "ETH",
+              decimals: 18,
+            },
+            blockExplorerUrls: ["https://goerli.etherscan.io"],
+          },
+          polygon: {
+            chainId: "0x89", // 137 in hex
+            chainName: "Polygon Mainnet",
+            rpcUrls: ["https://polygon-rpc.com"],
+            nativeCurrency: {
+              name: "MATIC",
+              symbol: "MATIC",
+              decimals: 18,
+            },
+            blockExplorerUrls: ["https://polygonscan.com"],
+          },
+          mumbai: {
+            chainId: "0x13881", // 80001 in hex
+            chainName: "Polygon Mumbai",
+            rpcUrls: ["https://rpc-mumbai.maticvigil.com"],
+            nativeCurrency: {
+              name: "MATIC",
+              symbol: "MATIC",
+              decimals: 18,
+            },
+            blockExplorerUrls: ["https://mumbai.polygonscan.com"],
+          },
+        };
+
+        async function setStatus(msg, type = "idle") {
+          // Update status text
+          const statusText = document.getElementById("statusText");
+          if (statusText) {
+            statusText.textContent = msg;
+          }
+
+          // Update status classes (idle, loading, success, error)
+          statusEl.className = "status " + type;
+          console.log(msg);
+        }
+
+        async function connectWallet() {
+          // If already connected, disconnect
+          if (isConnected) {
+            disconnectWallet();
+            return;
+          }
+
+          if (!window.ethereum) {
+            setStatus("No wallet found. Install MetaMask.", "error");
+            return;
+          }
+          try {
+            setStatus("Connecting to wallet...", "loading");
+            await window.ethereum.request({ method: "eth_requestAccounts" });
+            provider = new ethers.BrowserProvider(window.ethereum);
+            signer = await provider.getSigner();
+            const network = await provider.getNetwork();
+            const address = await signer.getAddress();
+
+            // Update network badge
+            const networkBadge = networkNameEl.parentElement;
+            if (
+              networkBadge &&
+              networkBadge.classList.contains("network-badge")
+            ) {
+              networkBadge.classList.remove("disconnected");
+            }
+
+            // Display network name (replace "unknown" with "Hardhat Local" for chain 31337)
+            let displayName = network.name;
+            if (network.chainId.toString() === "31337") {
+              displayName = "Hardhat Local";
+            }
+            networkNameEl.textContent =
+              displayName + " (" + network.chainId + ")";
+            networkNameEl.style.color = "";
+
+            // Update connect button
+            const connectBtn = document.getElementById("connectBtn");
+            const connectBtnText = document.getElementById("connectBtnText");
+            if (connectBtnText) {
+              connectBtnText.textContent =
+                address.substring(0, 6) + "..." + address.substring(38);
+            }
+            if (connectBtn) {
+              connectBtn.classList.add("connected");
+              connectBtn.style.background =
+                "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+            }
+
+            // Show switch network button
+            const switchNetworkBtn =
+              document.getElementById("switchNetworkBtn");
+            if (switchNetworkBtn) {
+              switchNetworkBtn.style.display = "inline-block";
+            }
+
+            isConnected = true;
+            setStatus("Wallet connected successfully", "success");
+            initContract();
+          } catch (err) {
+            console.error(err);
+            setStatus("User rejected connection or error", "error");
+          }
+        }
+
+        function disconnectWallet() {
+          // Reset connection state
+          provider = null;
+          signer = null;
+          contract = null;
+          isConnected = false;
+
+          // Reset UI
+          const connectBtn = document.getElementById("connectBtn");
+          const connectBtnText = document.getElementById("connectBtnText");
+
+          if (connectBtnText) {
+            connectBtnText.textContent = "Connect Wallet";
+          }
+          if (connectBtn) {
+            connectBtn.classList.remove("connected");
+            connectBtn.style.background = "";
+          }
+
+          // Reset network badge to Not Connected
+          const networkNameEl = document.getElementById("networkName");
+          if (networkNameEl) {
+            networkNameEl.textContent = "Not Connected";
+            networkNameEl.style.color = "";
+
+            // Add disconnected class to parent badge
+            const networkBadge = networkNameEl.parentElement;
+            if (
+              networkBadge &&
+              networkBadge.classList.contains("network-badge")
+            ) {
+              networkBadge.classList.add("disconnected");
+            }
+          }
+
+          // Clear stats
+          const totalWavesCount = document.getElementById("totalWavesCount");
+          const uniqueWavers = document.getElementById("uniqueWavers");
+          if (totalWavesCount) totalWavesCount.textContent = "0";
+          if (uniqueWavers) uniqueWavers.textContent = "0";
+
+          // Clear waves list
+          const wavesList = document.getElementById("wavesList");
+          if (wavesList) {
+            wavesList.innerHTML = `
+              <li class="text-center" style="color: var(--text-muted); padding: 40px 20px">
+                No waves yet. Be the first to send one! 🌊
+              </li>
+            `;
+          }
+
+          setStatus("Wallet disconnected - Please connect to continue", "idle");
+          console.log("Wallet disconnected - all state cleared");
+
+          // Hide switch network button
+          const switchNetworkBtn = document.getElementById("switchNetworkBtn");
+          if (switchNetworkBtn) {
+            switchNetworkBtn.style.display = "none";
+          }
+        }
+
+        async function switchNetwork(networkKey) {
+          if (!window.ethereum) {
+            setStatus("No wallet found. Install MetaMask.", "error");
+            return;
+          }
+
+          const networkConfig = NETWORKS[networkKey];
+          if (!networkConfig) {
+            setStatus("Invalid network selected", "error");
+            return;
+          }
+
+          try {
+            setStatus(`Switching to ${networkConfig.chainName}...`, "loading");
+
+            // Try to switch to the network
+            await window.ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: networkConfig.chainId }],
+            });
+
+            setStatus(`Switched to ${networkConfig.chainName}`, "success");
+
+            // Refresh the connection to update network info
+            if (isConnected) {
+              await updateNetworkInfo();
+            }
+          } catch (switchError) {
+            // This error code indicates that the chain has not been added to MetaMask
+            if (switchError.code === 4902) {
+              try {
+                setStatus(
+                  `Adding ${networkConfig.chainName} to MetaMask...`,
+                  "loading"
+                );
+                await window.ethereum.request({
+                  method: "wallet_addEthereumChain",
+                  params: [networkConfig],
+                });
+                setStatus(
+                  `Added and switched to ${networkConfig.chainName}`,
+                  "success"
+                );
+
+                if (isConnected) {
+                  await updateNetworkInfo();
+                }
+              } catch (addError) {
+                console.error(addError);
+                setStatus("Failed to add network", "error");
+              }
+            } else {
+              console.error(switchError);
+              setStatus("Failed to switch network", "error");
+            }
+          }
+        }
+
+        async function updateNetworkInfo() {
+          if (!provider) return;
+
+          try {
+            const network = await provider.getNetwork();
+            const networkNameEl = document.getElementById("networkName");
+            const networkBadge = networkNameEl.parentElement;
+
+            if (
+              networkBadge &&
+              networkBadge.classList.contains("network-badge")
+            ) {
+              networkBadge.classList.remove("disconnected");
+            }
+
+            // Display network name (replace "unknown" with "Hardhat Local" for chain 31337)
+            let displayName = network.name;
+            if (network.chainId.toString() === "31337") {
+              displayName = "Hardhat Local";
+            }
+            networkNameEl.textContent =
+              displayName + " (" + network.chainId + ")";
+            networkNameEl.style.color = "";
+
+            // Reinitialize contract if needed
+            if (contract) {
+              initContract();
+            }
+          } catch (err) {
+            console.error("Failed to update network info:", err);
+          }
+        }
+
+        function showNetworkSelector() {
+          const networkSelector = document.getElementById("networkSelector");
+          if (networkSelector) {
+            networkSelector.style.display = "block";
+          }
+        }
+
+        function hideNetworkSelector() {
+          const networkSelector = document.getElementById("networkSelector");
+          const networkSelect = document.getElementById("networkSelect");
+          if (networkSelector) {
+            networkSelector.style.display = "none";
+          }
+          if (networkSelect) {
+            networkSelect.value = "";
+          }
+        }
+
+        function initContract() {
+          const addr = contractAddressInput.value.trim();
+          if (!addr || addr === "CONTRACT_ADDRESS") {
+            setStatus(
+              "Please set CONTRACT_ADDRESS (replace placeholder).",
+              "error"
+            );
+            return;
+          }
+          try {
+            contract = new ethers.Contract(addr, ABI, signer);
+            // listen to NewWave events
+            contract.on &&
+              contract.on("NewWave", (from, timestamp, message) => {
+                // append to UI when event arrives
+                appendWave({
+                  waver: from,
+                  message,
+                  timestamp: Number(timestamp),
+                });
+                // Update totals when new wave arrives
+                getTotalWaves();
+              });
+            setStatus("Contract initialized: " + addr, "success");
+          } catch (err) {
+            console.error(err);
+            setStatus("Failed to initialize contract", "error");
+          }
+        }
+
+        function formatTimestamp(ts) {
+          // ts may be seconds (uint) -> convert to ms
+          try {
+            const n = Number(ts);
+            return new Date(n * 1000).toLocaleString();
+          } catch {
+            return String(ts);
+          }
+        }
+
+        function appendWave(wave) {
+          const li = document.createElement("li");
+          li.className = "wave-item";
+          li.innerHTML = `
+            <div class="wave-header">
+              <span class="wave-address">${wave.waver.substring(
+                0,
+                6
+              )}...${wave.waver.substring(38)}</span>
+              <span class="wave-time">${formatTimestamp(wave.timestamp)}</span>
+            </div>
+            <div class="wave-message">${escapeHtml(wave.message)}</div>
+          `;
+          // Clear "no waves" message if present
+          if (wavesList.querySelector(".text-center")) {
+            wavesList.innerHTML = "";
+          }
+          // Add newest first
+          wavesList.insertBefore(li, wavesList.firstChild);
+        }
+
+        function escapeHtml(str) {
+          if (!str) return "";
+          return str
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
+        }
+
+        async function sendWave() {
+          if (!contract) {
+            setStatus(
+              "Contract not initialized. Connect wallet and set address.",
+              "error"
+            );
+            return;
+          }
+          const msg = document.getElementById("message").value || "Hello!";
+          try {
+            setStatus("Sending transaction...", "loading");
+            const tx = await contract.wave(msg);
+            setStatus(
+              "Transaction submitted. Waiting for confirmation...",
+              "loading"
+            );
+            await tx.wait();
+            setStatus("Wave sent and mined ✅", "success");
+
+            // Clear message input
+            document.getElementById("message").value = "";
+
+            // Update total and list
+            await getTotalWaves();
+            await getAllWaves();
+          } catch (err) {
+            console.error(err);
+            setStatus("Error sending wave. See console.", "error");
+          }
+        }
+
+        async function getTotalWaves() {
+          if (!contract) {
+            setStatus("Contract not initialized.", "error");
+            return;
+          }
+          try {
+            const count = await contract.getTotalWaves();
+
+            // Update the stats counter
+            const totalWavesCount = document.getElementById("totalWavesCount");
+            if (totalWavesCount) {
+              totalWavesCount.textContent = String(count);
+            }
+
+            setStatus("Fetched total waves", "success");
+            return count;
+          } catch (err) {
+            console.error(err);
+            setStatus("Failed to fetch total waves", "error");
+          }
+        }
+
+        async function getAllWaves() {
+          if (!contract) {
+            setStatus("Contract not initialized.", "error");
+            return;
+          }
+          try {
+            setStatus("Fetching all waves...", "loading");
+            const all = await contract.getAllWaves();
+
+            // Clear list
+            wavesList.innerHTML = "";
+
+            if (all.length === 0) {
+              wavesList.innerHTML = `
+                <li class="text-center" style="color: var(--text-muted); padding: 40px 20px">
+                  No waves yet. Be the first to send one! 🌊
+                </li>
+              `;
+            } else {
+              // Display newest first
+              for (let i = all.length - 1; i >= 0; i--) {
+                const w = all[i];
+                appendWave({
+                  waver: w.waver || w[0],
+                  message: w.message || w[1],
+                  timestamp: Number(w.timestamp ?? w[2]),
+                });
+              }
+
+              // Calculate unique wavers
+              const uniqueWaversSet = new Set(all.map((w) => w.waver || w[0]));
+              const uniqueWaversEl = document.getElementById("uniqueWavers");
+              if (uniqueWaversEl) {
+                uniqueWaversEl.textContent = String(uniqueWaversSet.size);
+              }
+            }
+
+            setStatus("All waves loaded", "success");
+          } catch (err) {
+            console.error(err);
+            setStatus("Failed to fetch waves", "error");
+          }
+        }
+
+        // UI wiring
+        connectBtn.addEventListener("click", connectWallet);
+        sendWaveBtn.addEventListener("click", sendWave);
+        getAllBtn.addEventListener("click", getAllWaves);
+        getTotalBtn.addEventListener("click", getTotalWaves);
+        document
+          .getElementById("contractAddress")
+          .addEventListener("change", initContract);
+        document
+          .getElementById("contractAddress")
+          .addEventListener("blur", initContract);
+
+        // Network switcher UI wiring
+        const switchNetworkBtn = document.getElementById("switchNetworkBtn");
+        const confirmSwitchBtn = document.getElementById("confirmSwitchBtn");
+        const cancelSwitchBtn = document.getElementById("cancelSwitchBtn");
+        const networkSelect = document.getElementById("networkSelect");
+
+        switchNetworkBtn.addEventListener("click", () => {
+          showNetworkSelector();
+        });
+
+        confirmSwitchBtn.addEventListener("click", async () => {
+          const selectedNetwork = networkSelect.value;
+          if (!selectedNetwork) {
+            setStatus("Please select a network", "error");
+            return;
+          }
+          await switchNetwork(selectedNetwork);
+          hideNetworkSelector();
+        });
+
+        cancelSwitchBtn.addEventListener("click", () => {
+          hideNetworkSelector();
+        });
+
+        // artifact UI wiring
+        const artifactSelect = document.getElementById("artifactSelect");
+        const loadArtifactBtn = document.getElementById("loadArtifactBtn");
+        loadArtifactBtn.addEventListener("click", async () => {
+          const path = artifactSelect.value;
+          if (!path) {
+            setStatus("Select an artifact first", "error");
+            return;
+          }
+          await loadArtifact(path);
+        });
+
+        // generate initial view UI for default ABI
+        generateViewUI(ABI);
+
+        // Auto-init if MetaMask already connected
+        (async () => {
+          if (window.ethereum && window.ethereum.selectedAddress) {
+            await connectWallet();
+          }
+        })();
+
+        // Optional: suggest chain for Hardhat localhost if user wants (MetaMask must be configured)
+        // For Hardhat local RPC: chainId 31337 / 1337 depending on config. MetaMask must be set manually.
+      }); // End of window.addEventListener('load')
+    </script>
+  </body>
+</html>
